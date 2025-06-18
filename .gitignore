@@ -1,0 +1,46 @@
+# Временные файлы Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Локальные конфигурационные файлы
+user_config.json
+*.local
+
+# Логи
+*.log
+logs/
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+
+# Временные файлы установки
+*.pid
+/tmp/
+/var/run/
+
+# Резервные копии
+*.bak
+*.backup
+*~
+
+# IDE файлы
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Архивы (создаются автоматически)
+*.tar.gz
+*.zip
+*.tar.bz2
+
+# Тестовые файлы
+test_*
+*_test.py
+
+# Файлы статистики
+.coverage
+htmlcov/ 

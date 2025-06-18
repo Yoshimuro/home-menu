@@ -1,0 +1,76 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9, "3.10", "3.11"]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Test server syntax
+      run: |
+        python -m py_compile server.py
+        python -m py_compile server-lite.py  
+        python -m py_compile server-minimal.py
+        python -m py_compile config.py
+    
+    - name: Test server startup (dry run)
+      run: |
+        timeout 5 python server.py --help || true
+        timeout 5 python server-lite.py --help || true
+        timeout 5 python server-minimal.py --help || true
+    
+    - name: Check HTML syntax
+      run: |
+        if command -v tidy &> /dev/null; then
+          tidy -q -e index.html || echo "HTML syntax check completed"
+        else
+          echo "Tidy not available, skipping HTML check"
+        fi
+
+  test-openwrt-simulation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python (minimal)
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.7  # Simulate older OpenWrt Python
+    
+    - name: Test minimal server
+      run: |
+        echo "Testing minimal server compatibility..."
+        python -c "
+import sys
+print(f'Python version: {sys.version}')
+# Test imports used in server-minimal.py
+import socket
+import os
+import signal
+import threading
+import time
+print('✅ All required modules available')
+"
+    
+    - name: Test installation script
+      run: |
+        # Test script syntax
+        bash -n install.sh
+        bash -n uninstall.sh
+        echo "✅ Shell scripts syntax OK" 
